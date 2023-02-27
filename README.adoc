@@ -1,0 +1,244 @@
+= Caddy OVH Container
+Jordan Williams <jordan@jwillikers.com>
+:experimental:
+:icons: font
+ifdef::env-github[]
+:tip-caption: :bulb:
+:note-caption: :information_source:
+:important-caption: :heavy_exclamation_mark:
+:caution-caption: :fire:
+:warning-caption: :warning:
+endif::[]
+:Asciidoctor_: https://asciidoctor.org/[Asciidoctor]
+:Buildah: https://buildah.io/[Buildah]
+:Fedora: https://getfedora.org/[Fedora]
+:Fedora-Silverblue: https://silverblue.fedoraproject.org/[Fedora Silverblue]
+:fish: https://fishshell.com/[fish]
+:Git: https://git-scm.com/[Git]
+:Linux: https://www.linuxfoundation.org/[Linux]
+:Caddy: https://caddyserver.com/v2[Caddy]
+:Caddy-OVH-Module: https://github.com/caddy-dns/ovh[Caddy OVH Module]
+:Podman: https://podman.io/[Podman]
+:pre-commit: https://pre-commit.com/[pre-commit]
+:Python: https://www.python.org/[Python]
+:Rouge: https://rouge.jneen.net/[Rouge]
+:Ruby: https://www.ruby-lang.org/en/[Ruby]
+
+image:https://github.com/jwillikers/caddy-ovh-image/workflows/CI/badge.svg["Build Status", link="https://github.com/jwillikers/caddy-ovh-image/actions?query=workflow%3ACI"]
+image:https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white[pre-commit, link=https://github.com/pre-commit/pre-commit]
+
+A container image for the running the Caddy reverse-proxy complete with the {Caddy-OVH-Module} capable of completing the ACME DNS-01 challenge.
+
+== Synopsis
+
+Image:: https://quay.io/repository/jwillikers/caddy-ovh[quay.io/jwillikers/caddy-ovh]
+
+Tags::
+* `latest`
+
+Supported architectures::
+* `amd64` _(x86_64)_
+* `arm64` _(aarch64)_
+
+Labels::
+`io.containers.autoupdate=registry`::: Enables automatic updates when using {Podman} and the _fully-qualified_ image name.
+
+== Quick Start
+
+I recommend putting the Caddy container along with all of the containers it will proxy on a dedicated CNI network with the DNS plugin enabled.
+This makes it easy to delegate to the corresponding containers and doesn't require port-forwarding on their part, which means port address conflicts won't be an issue.
+A dedicated CNI network also provides better isolation.
+If you need to, you can also use the Caddy container with host networking with other containers using host networking or those using the default `slirp4netns` networking mode.
+The example instructions here use CNI networking.
+
+. Allow rootless containers to publish to ports 80 and 443 by lowering the starting port for the range of unprivileged ports.
+This makes it possible to run the Caddy container rootless and use the standard HTTP and HTTPS ports.
++
+./etc/sysctl.d/99-lower-unprivileged_port_start.conf
+[source]
+----
+; Allow publishing to lower port numbers without requiring superuser privileges.
+net.ipv4.ip_unprivileged_port_start=80
+----
+
+. Load the new sysctl configuration.
++
+[source,sh]
+----
+sudo sysctl --system
+----
+
+. Open the default HTTP and HTTPS ports, 80 and 443 respectively, in the firewall, since rootless Podman won't be able to open these ports for the container.
++
+[source,sh]
+----
+sudo firewall-cmd --add-port=80/tcp --add-port=443/tcp --permanent
+----
+
+. Reload the firewall rules that were just saved.
++
+[source,sh]
+----
+sudo firewall-cmd --reload
+----
+
+. Create a new Podman network which will have DNS networking enabled by default.
++
+[source,sh]
+----
+podman network create --ipv6
+----
+
+. Make sure to set the OVH TLS encryption mode to `Full (strict)` to avoid problems with Caddy.
+
+. Create a OVH API token for your domain with `Zone:Read` and `DNS:Edit` permissions.
+
+. Store your OVH endpoint as a Podman secret to avoid exposing it.
++
+[,sh]
+----
+printf '****' '%s' | podman secret create ovh_endpoint -
+----
+
+. Store your OVH application key as a Podman secret to avoid exposing it.
++
+[,sh]
+----
+printf '****' '%s' | podman secret create ovh_application_key -
+----
+
+. Store your OVH application secret as a Podman secret to avoid exposing it.
++
+[,sh]
+----
+printf '****' '%s' | podman secret create ovh_application_secret -
+----
+
+. Store your OVH consumer key as a Podman secret to avoid exposing it.
++
+[,sh]
+----
+printf '****' '%s' | podman secret create ovh_consumer_key -
+----
+
+. In your Caddyfile, be sure to provide the previously stored secrets to the module.
+Then it's just a matter of proxying to hosts using the network's domain name, `dns.podman` by default.
+The following Caddyfile demonstrates enabling the OVH DNS-01 ACME challenge globally and configuring a reverse-proxy to a container running Gitea on the same CNI network.
++
+.Caddyfile
+[source]
+----
+tls {
+  acme_dns ovh {
+    endpoint {$OVH_ENDPOINT}
+    application_key {$OVH_APPLICATION_KEY}
+    application_secret {$OVH_APPLICATION_SECRET}
+    consumer_key {$OVH_CONSUMER_KEY}
+
+    # For testing
+    # acme_ca https://acme-staging-v02.api.letsencrypt.org/directory
+  }
+}
+
+gitea.example {
+	reverse_proxy gitea.dns.podman:3000
+}
+----
+
+. Run Caddy rootless, forwarding the appropriate ports, proving the OVH secrets, and mounting the Caddyfile along with the necessary directories.
++
+[,sh]
+----
+podman run \
+  --detach \
+  --label "io.containers.autoupdate=registry" \
+  --name caddy \
+  --network podman1 \
+  --publish 80:80/tcp \
+  --publish 443:443/tcp \
+  --rm \
+  --secret ovh_endpoint,type=env,target=OVH_ENDPOINT \
+  --secret ovh_application_key,type=env,target=OVH_APPLICATION_KEY \
+  --secret ovh_application_secret,type=env,target=OVH_APPLICATION_SECRET \
+  --secret ovh_consumer_key,type=env,target=OVH_CONSUMER_KEY \
+  --volume $PWD/Caddyfile:/etc/caddy/Caddyfile:Z \
+  --volume caddy-config:/config/:Z \
+  --volume caddy-data:/data/:Z \
+  quay.io/jwillikers/caddy-ovh:latest
+----
+
+== Build
+
+. Install the necessary dependencies.
++
+[source,sh]
+----
+sudo dnf -y install fish git podman pre-commit
+----
+
+. Clone this repository.
++
+[source,sh]
+----
+git -C ~/Projects clone git@github.com:jwillikers/caddy-ovh-image.git
+----
+
+. Change into the project directory.
++
+[source,sh]
+----
+cd ~/Projects/caddy-ovh-image
+----
+
+. Install pre-commit's Git hooks.
++
+[source,sh]
+----
+pre-commit install
+----
+
+. Build the `Containerfile`.
++
+[source,sh]
+----
+podman build . -t caddy-ovh
+----
+
+== Contributing
+
+Contributions in the form of issues, feedback, and even pull requests are welcome.
+Make sure to adhere to the project's link:CODE_OF_CONDUCT.adoc[Code of Conduct].
+
+== Open Source Software
+
+This project is built on the hard work of countless open source contributors.
+Several of these projects are enumerated below.
+
+* {Asciidoctor_}
+* {Buildah}
+* {Caddy}
+* {Caddy-OVH-Module}
+* {Fedora}
+* {Fedora-Silverblue}
+* {fish}
+* {Git}
+* {Linux}
+* {Podman}
+* {pre-commit}
+* {Python}
+* {Rouge}
+* {Ruby}
+
+== Code of Conduct
+
+Refer to the project's link:CODE_OF_CONDUCT.adoc[Code of Conduct] for details.
+
+== License
+
+This repository is licensed under the https://www.gnu.org/licenses/gpl-3.0.html[GPLv3], a copy of which is provided in the link:LICENSE.adoc[license file].
+
+© 2023 Jordan Williams
+
+== Authors
+
+mailto:{email}[{author}]
