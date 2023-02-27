@@ -167,6 +167,48 @@ podman run \
   quay.io/jwillikers/caddy-ovh:latest
 ----
 
+=== Kubernetes
+
+The Caddy container can also be configured and run via Kubernetes YAML.
+These instructions use the same Podman network created in the previous section.
+
+. Configure a Kubernetes YAML file with the necessary secrets for OVH.
++
+.caddy-secrets.yaml
+[,yaml]
+----
+include::caddy-secrets.yaml[]
+----
+
+. Load the secrets into Podman.
++
+[,sh]
+----
+podman play kube caddy-secrets.yaml
+----
+
+. Delete the secrets file.
++
+[,sh]
+----
+rm caddy-secrets.yaml
+----
+
+. Configure the path to the `Caddyfile` in the `caddy.yaml` Kubernetes YAML file.
++
+.caddy.yaml
+[,yaml]
+----
+include::caddy.yaml[]
+----
+
+. Run the Caddy pod using the Kubernetes YAML file.
++
+[,sh]
+----
+podman play kube --network podman1 --replace
+----
+
 == Build
 
 . Install the necessary dependencies.
