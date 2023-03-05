@@ -128,7 +128,7 @@ printf '****' '%s' | podman secret create ovh_consumer_key -
 
 . In your Caddyfile, be sure to provide the previously stored secrets to the module.
 Then it's just a matter of proxying to hosts using the network's domain name, `dns.podman` by default.
-The following Caddyfile demonstrates enabling the OVH DNS-01 ACME challenge globally and configuring a reverse-proxy to a container running Gitea on the same CNI network.
+The following Caddyfile demonstrates enabling the OVH DNS-01 ACME challenge globally and configuring a reverse-proxy to a container running Gitea on the same Podman network.
 +
 .Caddyfile
 [source]
