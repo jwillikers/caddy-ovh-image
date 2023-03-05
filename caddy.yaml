@@ -52,11 +52,7 @@ spec:
         type: spc_t
     env:
     - name: OVH_ENDPOINT
-      valueFrom:
-        secretKeyRef:
-          name: caddy-secrets
-          key: ovh_endpoint
-          optional: false
+      value: ovh-eu
     - name: OVH_APPLICATION_KEY
       valueFrom:
         secretKeyRef:
