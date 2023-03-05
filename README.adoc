@@ -134,15 +134,15 @@ The following Caddyfile demonstrates enabling the OVH DNS-01 ACME challenge glob
 [source]
 ----
 {
-  email jordan@jwillikers.com
-  acme_dns ovh {
-    endpoint {$OVH_ENDPOINT}
-    application_key {$OVH_APPLICATION_KEY}
-    application_secret {$OVH_APPLICATION_SECRET}
-    consumer_key {$OVH_CONSUMER_KEY}
-  }
-  # For testing
-  # acme_ca https://acme-staging-v02.api.letsencrypt.org/directory
+	email jordan@jwillikers.com
+	acme_dns ovh {
+		endpoint {$OVH_ENDPOINT}
+		application_key {$OVH_APPLICATION_KEY}
+		application_secret {$OVH_APPLICATION_SECRET}
+		consumer_key {$OVH_CONSUMER_KEY}
+	}
+	# For testing
+	# acme_ca https://acme-staging-v02.api.letsencrypt.org/directory
 }
 
 gitea.example {
