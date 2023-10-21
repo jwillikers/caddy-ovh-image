@@ -7,6 +7,7 @@
         "autoupdate",
         "Buildah",
         "Caddyfile",
+        "certbot",
         "conflist",
         "Containerfile",
         "creds",

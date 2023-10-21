@@ -166,7 +166,7 @@ podman run \
   --secret ovh_application_key,type=env,target=OVH_APPLICATION_KEY \
   --secret ovh_application_secret,type=env,target=OVH_APPLICATION_SECRET \
   --secret ovh_consumer_key,type=env,target=OVH_CONSUMER_KEY \
-  --volume $PWD/Caddyfile:/etc/caddy/Caddyfile:Z \
+  --volume $PWD:/etc/caddy:Z \
   --volume caddy-config:/config/:Z \
   --volume caddy-data:/data/:Z \
   quay.io/jwillikers/caddy-ovh:latest
@@ -211,7 +211,7 @@ include::caddy.yaml[]
 +
 [,sh]
 ----
-podman play kube --network podman1 --replace
+podman play kube --network podman --replace
 ----
 
 == Build
