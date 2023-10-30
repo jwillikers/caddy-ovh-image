@@ -1,4 +1,4 @@
-= Caddy OVH Container
+= Caddy OVH Image
 Jordan Williams <jordan@jwillikers.com>
 :experimental:
 :icons: font
