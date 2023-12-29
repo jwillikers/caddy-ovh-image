@@ -18,7 +18,7 @@ jobs:
         arch:
           - amd64
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
       - name: Lint Containerfile
         uses: hadolint/hadolint-action@master
@@ -48,7 +48,7 @@ jobs:
           printf '[storage]\ndriver="overlay"\n\n[storage.options]\nmount_program="/usr/bin/fuse-overlayfs"\n' > ~/.config/containers/storage.conf
 
       - name: Check out the repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Build the image with Podman
         run: podman build . --arch ${{ matrix.arch }} --tag caddy-ovh-${{ matrix.arch }}
@@ -78,7 +78,7 @@ jobs:
   #       uses: docker/setup-qemu-action@v1
 
   #     - name: Check out the repository
-  #       uses: actions/checkout@v2
+  #       uses: actions/checkout@v4
 
   #     - uses: actions/download-artifact@v2
   #       with:
