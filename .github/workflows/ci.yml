@@ -80,7 +80,7 @@ jobs:
   #     - name: Check out the repository
   #       uses: actions/checkout@v2
 
-  #     - uses: actions/download-artifact@v2
+  #     - uses: actions/download-artifact@v4
   #       with:
   #         name: caddy-ovh-${{ matrix.arch }}
 
@@ -100,7 +100,7 @@ jobs:
         run: buildah manifest create caddy-ovh:latest
 
       # aarch64
-      - uses: actions/download-artifact@v2
+      - uses: actions/download-artifact@v4
         with:
           name: caddy-ovh-arm64
 
@@ -111,7 +111,7 @@ jobs:
         run: buildah manifest add caddy-ovh:latest localhost/caddy-ovh-arm64
 
       # x86_64
-      - uses: actions/download-artifact@v2
+      - uses: actions/download-artifact@v4
         with:
           name: caddy-ovh-amd64
 
