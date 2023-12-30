@@ -56,7 +56,7 @@ jobs:
       - name: Export the image
         run: podman image save --format oci-archive -o caddy-ovh-${{ matrix.arch }}.tar localhost/caddy-ovh-${{ matrix.arch }}
 
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v4
         with:
           name: caddy-ovh-${{ matrix.arch }}
           path: caddy-ovh-${{ matrix.arch }}.tar
