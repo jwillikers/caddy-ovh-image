@@ -39,7 +39,7 @@ jobs:
         uses: fish-actions/install-fish@v1.1.0
 
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@v1
+        uses: docker/setup-qemu-action@v3
 
       - name: Configure Podman and Buildah to use FUSE
         run: |
@@ -75,7 +75,7 @@ jobs:
   #       uses: fish-actions/install-fish@v1.1.0
 
   #     - name: Set up QEMU
-  #       uses: docker/setup-qemu-action@v1
+  #       uses: docker/setup-qemu-action@v3
 
   #     - name: Check out the repository
   #       uses: actions/checkout@v4
