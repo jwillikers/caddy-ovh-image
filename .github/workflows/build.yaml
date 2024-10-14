@@ -72,7 +72,7 @@ jobs:
           podman image load --input caddy-ovh-aarch64-linux.tar.zst
 
       - name: Add the aarch64 image to the manifest
-        run: buildah manifest add caddy-ovh:latest quay.io/jwillikers/caddy-ovh-aarch64-linux
+        run: buildah manifest add caddy-ovh:latest localhost/caddy-ovh-aarch64-linux
 
       # x86_64
       - uses: actions/download-artifact@v4
@@ -83,7 +83,7 @@ jobs:
         run: podman image load --input caddy-ovh-x86_64-linux.tar.zst
 
       - name: Add the x86_64 image to the manifest
-        run: buildah manifest add caddy-ovh:latest quay.io/jwillikers/caddy-ovh-x86_64-linux
+        run: buildah manifest add caddy-ovh:latest localhost/caddy-ovh-x86_64-linux
 
       - name: Push latest manifest and images to quay.io
         run: |
