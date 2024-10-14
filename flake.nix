@@ -57,7 +57,6 @@
           # caddyOvhImage = pkgs.dockerTools.streamLayeredImage {
           name = "localhost/caddy-ovh-${system}";
           # name = "caddy-ovh";
-          tag = "latest";
           compressor = "zstd";
 
           fromImage = caddyImage;
