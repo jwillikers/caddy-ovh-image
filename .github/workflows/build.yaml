@@ -1,0 +1,95 @@
+name: Build
+"on":
+  pull_request:
+    paths:
+      - .github/workflows/build.yaml
+      - '**.nix'
+      - caddy-src/
+      - flake.lock
+  push:
+    branches:
+      - main
+    paths:
+      - .github/workflows/build.yaml
+      - '**.nix'
+      - caddy-src/
+      - flake.lock
+  schedule:
+    # Run at 04:10 on Sunday
+    - cron: "10 4 * * 0"
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        arch:
+          - aarch64
+          - x86_64
+    steps:
+      - uses: actions/checkout@v4
+      - uses: DeterminateSystems/nix-installer-action@v14
+      - uses: DeterminateSystems/magic-nix-cache-action@v8
+      # - name: Set up QEMU
+      #   uses: docker/setup-qemu-action@v3
+      # - name: Configure Podman and Buildah to use FUSE
+      #   run: |
+      #     sudo apt-get --yes install fuse-overlayfs
+      #     mkdir --parents ~/.config/containers
+      #     printf '[storage]\ndriver="overlay"\n\n[storage.options]\nmount_program="/usr/bin/fuse-overlayfs"\n' \
+      #       > ~/.config/containers/storage.conf
+      - name: Build the image
+        # run: podman build . --arch ${{ matrix.arch }} --tag caddy-ovh-${{ matrix.arch }}
+        run: nix build
+      # - name: Load the aarch64 image
+      #   run: podman image load --input caddy-ovh-aarch64.tar.zst
+      - name: Export the image
+        # run: podman image save --format oci-archive --output caddy-ovh-${{ matrix.arch }}.tar \
+        #      localhost/caddy-ovh-${{ matrix.arch }}
+        run: ln --force --symbolic --relative "$(readlink result)" "caddy-ovh-${{ matrix.arch }}-linux.tar.zst"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: caddy-ovh-${{ matrix.arch }}-linux
+          path: caddy-ovh-${{ matrix.arch }}-linux.tar.zst
+
+  publish:
+    name: Publish
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - name: Create a manifest
+        run: buildah manifest create caddy-ovh:latest
+
+      # aarch64
+      - uses: actions/download-artifact@v4
+        with:
+          name: caddy-ovh-aarch64-linux
+
+      - name: Load the aarch64 image
+        run: |
+          podman image load --input caddy-ovh-aarch64-linux.tar.zst
+
+      - name: Add the aarch64 image to the manifest
+        run: buildah manifest add caddy-ovh:latest quay.io/jwillikers/caddy-ovh-aarch64-linux
+
+      # x86_64
+      - uses: actions/download-artifact@v4
+        with:
+          name: caddy-ovh-x86_64-linux
+
+      - name: Load the x86_64 image
+        run: podman image load --input caddy-ovh-x86_64-linux.tar.zst
+
+      - name: Add the x86_64 image to the manifest
+        run: buildah manifest add caddy-ovh:latest quay.io/jwillikers/caddy-ovh-x86_64-linux
+
+      - name: Push latest manifest and images to quay.io
+        run: |
+          buildah manifest push \
+          --all \
+          --creds jwillikers+publisher:${{ secrets.REGISTRY_PASSWORD }} \
+          --rm \
+          caddy-ovh:latest \
+          docker://quay.io/jwillikers/caddy-ovh

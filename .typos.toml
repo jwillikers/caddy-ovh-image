@@ -1,0 +1,5 @@
+[default]
+extend-ignore-re = [
+  # Ignore hashes in the go.mod file.
+  "github.com/[0-9A-Za-z_\\-\\.]+/[0-9A-Za-z_\\-\\.]+[[:space:]][0-9A-Za-z_\\-\\.]+",
+]

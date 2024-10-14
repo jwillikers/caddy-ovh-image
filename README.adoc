@@ -11,23 +11,16 @@ ifdef::env-github[]
 endif::[]
 :Asciidoctor_: https://asciidoctor.org/[Asciidoctor]
 :Buildah: https://buildah.io/[Buildah]
-:Caddy: https://caddyserver.com/v2[Caddy]
+:Caddy: https://caddyserver.com[Caddy]
 :Caddy-OVH-Module: https://github.com/caddy-dns/ovh[Caddy OVH Module]
 :certbot-dns-ovh-documentation: https://certbot-dns-ovh.readthedocs.io/en/stable/[certbot-dns-ovh Documentation]
-:Fedora: https://getfedora.org/[Fedora]
-:Fedora-Silverblue: https://silverblue.fedoraproject.org/[Fedora Silverblue]
-:fish: https://fishshell.com/[fish]
 :Git: https://git-scm.com/[Git]
 :Linux: https://www.linuxfoundation.org/[Linux]
 :OVH-Create-Token-Page: https://www.ovh.com/auth/api/createToken[OVH Create Token Page]
 :Podman: https://podman.io/[Podman]
 :pre-commit: https://pre-commit.com/[pre-commit]
-:Python: https://www.python.org/[Python]
-:Rouge: https://rouge.jneen.net/[Rouge]
-:Ruby: https://www.ruby-lang.org/en/[Ruby]
 
-image:https://github.com/jwillikers/caddy-ovh-image/workflows/CI/badge.svg["Build Status", link="https://github.com/jwillikers/caddy-ovh-image/actions?query=workflow%3ACI"]
-image:https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white[pre-commit, link=https://github.com/pre-commit/pre-commit]
+image:https://github.com/jwillikers/caddy-ovh-image/workflows/Build/badge.svg["Build Status", link="https://github.com/jwillikers/caddy-ovh-image/actions?query=workflow%3ABuild"]
 
 A container image for the running the Caddy reverse-proxy complete with the {Caddy-OVH-Module} capable of completing the ACME DNS-01 challenge.
 
@@ -39,8 +32,9 @@ Tags::
 * `latest`
 
 Supported architectures::
-* `amd64` _(x86_64)_
-* `arm64` _(aarch64)_
+* `aarch64`
+// * todo RISC-V
+* `x86_64`
 
 Labels::
 `io.containers.autoupdate=registry`::: Enables automatic updates when using {Podman} and the _fully-qualified_ image name.
@@ -216,39 +210,49 @@ podman play kube --network podman --replace
 
 == Build
 
-. Install the necessary dependencies.
+. Install an implementation of Nix, such as https://lix.systems[Lix] used here.
 +
 [,sh]
 ----
-sudo dnf -y install fish git podman pre-commit
+curl -sSf -L https://install.lix.systems/lix | sh -s -- install
 ----
 
 . Clone this repository.
 +
 [,sh]
 ----
-git -C ~/Projects clone git@github.com:jwillikers/caddy-ovh-image.git
+git clone git@github.com:jwillikers/caddy-ovh-image.git
 ----
 
 . Change into the project directory.
 +
 [,sh]
 ----
-cd ~/Projects/caddy-ovh-image
+cd caddy-ovh-image
 ----
 
-. Install pre-commit's Git hooks.
+. Install direnv for your system according to the https://direnv.net/docs/installation.html[direnv installation instructions].
 +
 [,sh]
 ----
-pre-commit install
+sudo rpm-ostree install direnv
+sudo systemctl reboot
 ----
 
-. Build the `Containerfile`.
+. Integrate direnv with your shell by following the instructions on the https://direnv.net/docs/hook.html[direnv Setup page].
+
+. Permit the direnv configuration in the repository.
 +
 [,sh]
 ----
-podman build . -t caddy-ovh
+direnv allow
+----
+
+. Build the image with `nix build`.
++
+[,sh]
+----
+nix build
 ----
 
 == Contributing
@@ -265,16 +269,10 @@ Several of these projects are enumerated below.
 * {Buildah}
 * {Caddy}
 * {Caddy-OVH-Module}
-* {Fedora}
-* {Fedora-Silverblue}
-* {fish}
 * {Git}
 * {Linux}
 * {Podman}
 * {pre-commit}
-* {Python}
-* {Rouge}
-* {Ruby}
 
 == Code of Conduct
 
@@ -284,7 +282,7 @@ Refer to the project's link:CODE_OF_CONDUCT.adoc[Code of Conduct] for details.
 
 This repository is licensed under the https://www.gnu.org/licenses/gpl-3.0.html[GPLv3], a copy of which is provided in the link:LICENSE.adoc[license file].
 
-© 2023 Jordan Williams
+© 2023-2024 Jordan Williams
 
 == Authors
 

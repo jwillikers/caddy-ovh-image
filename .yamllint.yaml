@@ -1,0 +1,16 @@
+extends: default
+
+ignore:
+  - .cache/
+  - .direnv/
+  - .flatpak/
+  - .flatpak-builder/
+  - build*/
+  - repo/
+
+rules:
+  document-start: disable
+  document-end: disable
+  line-length: disable
+  comments:
+    min-spaces-from-content: 1

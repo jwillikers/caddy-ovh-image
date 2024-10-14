@@ -1,2 +1,20 @@
-.cache/
-roles/
+# Archives
+*.tar*
+
+# Asciidoctor
+*.html
+
+# direnv
+.direnv/
+
+# git-hooks.nix
+/.pre-commit-config.yaml
+
+# go
+vendor/
+
+# lychee
+.lycheecache
+
+# Nix
+result
