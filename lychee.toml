@@ -1,0 +1,13 @@
+# Due to rate limiting from gnu.org
+accept = [429]
+
+cache = true
+exclude_path = [
+  ".cache/",
+  ".direnv/",
+  ".flatpak/",
+  ".flatpak-builder/",
+  "build.*/",
+  "repo/",
+]
+max_cache_age = "2w"

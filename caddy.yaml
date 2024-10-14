@@ -6,7 +6,6 @@
 # NOTE: If you generated this yaml from an unprivileged and rootless podman container on an SELinux
 # enabled system, check the podman generate kube man page for steps to follow to ensure that your pod/container
 # has the right permissions to access the volumes added.
----
 apiVersion: v1
 kind: Service
 metadata:
@@ -16,14 +15,14 @@ metadata:
   name: caddy-pod
 spec:
   ports:
-  - name: "80"
-    nodePort: 32761
-    port: 80
-    targetPort: 80
-  - name: "443"
-    nodePort: 31845
-    port: 443
-    targetPort: 443
+    - name: "80"
+      nodePort: 32761
+      port: 80
+      targetPort: 80
+    - name: "443"
+      nodePort: 31845
+      port: 443
+      targetPort: 443
   selector:
     app: caddy-pod
   type: NodePort
@@ -40,57 +39,57 @@ metadata:
   name: caddy-pod
 spec:
   containers:
-  - image: quay.io/jwillikers/caddy-ovh:latest
-    name: caddy
-    securityContext:
-      # todo Run in the user namespace once Podman supports sysctls.
-      # https://github.com/containers/podman/issues/16711
-      # sysctls:
-      # - name: net.ipv4.ip_unprivileged_port_start
-      #   value: "80"
-      seLinuxOptions:
-        type: spc_t
-    env:
-    - name: OVH_ENDPOINT
-      value: ovh-eu
-    - name: OVH_APPLICATION_KEY
-      valueFrom:
-        secretKeyRef:
-          name: caddy-secrets
-          key: ovh_application_key
-          optional: false
-    - name: OVH_APPLICATION_SECRET
-      valueFrom:
-        secretKeyRef:
-          name: caddy-secrets
-          key: ovh_application_secret
-          optional: false
-    - name: OVH_CONSUMER_KEY
-      valueFrom:
-        secretKeyRef:
-          name: caddy-secrets
-          key: ovh_consumer_key
-          optional: false
-    ports:
-    - containerPort: 80
-      hostPort: 80
-    - containerPort: 443
-      hostPort: 443
-    volumeMounts:
-    - mountPath: /etc/caddy/Caddyfile
-      name: path-to-Caddyfile-host-0
-    - mountPath: /config/
-      name: caddy-config-pvc
-    - mountPath: /data/
-      name: caddy-data-pvc
+    - image: quay.io/jwillikers/caddy-ovh:latest
+      name: caddy
+      securityContext:
+        # todo Run in the user namespace once Podman supports sysctls.
+        # https://github.com/containers/podman/issues/16711
+        # sysctls:
+        # - name: net.ipv4.ip_unprivileged_port_start
+        #   value: "80"
+        seLinuxOptions:
+          type: spc_t
+      env:
+        - name: OVH_ENDPOINT
+          value: ovh-eu
+        - name: OVH_APPLICATION_KEY
+          valueFrom:
+            secretKeyRef:
+              name: caddy-secrets
+              key: ovh_application_key
+              optional: false
+        - name: OVH_APPLICATION_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: caddy-secrets
+              key: ovh_application_secret
+              optional: false
+        - name: OVH_CONSUMER_KEY
+          valueFrom:
+            secretKeyRef:
+              name: caddy-secrets
+              key: ovh_consumer_key
+              optional: false
+      ports:
+        - containerPort: 80
+          hostPort: 80
+        - containerPort: 443
+          hostPort: 443
+      volumeMounts:
+        - mountPath: /etc/caddy/Caddyfile
+          name: path-to-Caddyfile-host-0
+        - mountPath: /config/
+          name: caddy-config-pvc
+        - mountPath: /data/
+          name: caddy-data-pvc
   volumes:
-  - hostPath:
-      path: /path/to/Caddyfile
-      type: File
-    name: path-to-Caddyfile-host-0
-  - name: caddy-config-pvc
-    persistentVolumeClaim:
-      claimName: caddy-config
-  - name: caddy-data-pvc
-    persistentVolumeClaim:
-      claimName: caddy-data
+    - hostPath:
+        path: /path/to/Caddyfile
+        type: File
+      name: path-to-Caddyfile-host-0
+    - name: caddy-config-pvc
+      persistentVolumeClaim:
+        claimName: caddy-config
+    - name: caddy-data-pvc
+      persistentVolumeClaim:
+        claimName: caddy-data
