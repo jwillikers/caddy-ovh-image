@@ -31,8 +31,6 @@
           just
           lychee
           nil
-          nix-update-scripts.packages.${system}.update-nix-direnv
-          nix-update-scripts.packages.${system}.update-nixos-release
         ];
         buildInputs = with pkgs; [ ];
         caddyOvh = pkgs.buildGoModule {
@@ -41,6 +39,9 @@
           src = ./caddy-src;
           runVend = true;
           vendorHash = "sha256-51SNBJlUBE9H8+vYjlXypy6thgjnvw4wTPQBA9K2zyk=";
+          # postBuild = ''
+          #   cargo objcopy -- -O ihex pwm-fan-controller-attiny85.hex
+          # '';
           meta = {
             mainProgram = "caddy";
           };
@@ -61,8 +62,8 @@
             # arch = "x86_64";
           };
         };
-        caddyOvhImage = pkgs.dockerTools.buildImage {
-          # caddyOvhImage = pkgs.dockerTools.streamLayeredImage {
+        # caddyOvhImage = pkgs.dockerTools.buildImage {
+        caddyOvhImage = pkgs.dockerTools.buildLayeredImage {
           name = "localhost/caddy-ovh";
           tag = "${system}";
           # name = "caddy-ovh";
@@ -72,24 +73,30 @@
           # fromImageName = "docker.io/library/caddy";
           # fromImageTag = "latest";
 
-          copyToRoot = pkgs.buildEnv {
-            # contents = pkgs.buildEnv {
-            name = "image-root";
-            paths = [ caddyOvh ];
-            pathsToLink = [ "/bin" ];
-          };
+          # copyToRoot = pkgs.buildEnv {
+          # contents = pkgs.buildEnv {
+          contents = [
+            # name = "image-root";
+            # paths = [ caddyOvh pkgs.libcap pkgs.mailcap ];
+            # pathsToLink = [ "/bin" ];
+            caddyOvh
+            pkgs.libcap
+            pkgs.mailcap
+          ];
 
+          enableFakechroot = true;
           # runAsRoot = ''
-          #   #!${pkgs.runtimeShell}
-          #   mkdir -p /data
-          # '';
+          fakeRootCommands = ''
+            ${pkgs.libcap}/bin/setcap cap_net_bind_service=+ep ${caddyOvh}/bin/caddy;
+          '';
 
           # copyToRoot = with pkgs; [
           #   # cacert
           #   caddyOvh
-          #   # libcap
-          #   # mailcap
+          #   libcap
+          #   mailcap
           # ];
+
           config = {
             Cmd = [
               "${caddyOvh}/bin/caddy"

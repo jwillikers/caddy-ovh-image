@@ -35,4 +35,8 @@ stdenv.mkDerivation {
     "--preset=minimal"
     "-DCMAKE_LINKER_TYPE=MOLD"
   ];
+
+  postBuild = ''
+    cargo objcopy -- -O ihex pwm-fan-controller-attiny85.hex
+  '';
 }
