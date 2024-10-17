@@ -55,8 +55,6 @@
           contents = [
             caddyOvh
             pkgs.cacert
-            pkgs.libcap
-            pkgs.mailcap
           ];
 
           extraCommands = ''
