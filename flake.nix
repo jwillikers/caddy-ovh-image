@@ -95,6 +95,7 @@
           # enableFakechroot = true;
           extraCommands = ''
             mkdir --parents config/caddy data/caddy etc/caddy srv usr/share/caddy
+            ${pkgs.libcap}/bin/setcap cap_net_bind_service=+ep ${caddyOvh}/bin/caddy;
           '';
           # fakeRootCommands = ''
           #   mkdir --parents /config/caddy /data/caddy /etc/caddy /usr/share/caddy
