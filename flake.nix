@@ -1,12 +1,11 @@
 {
   inputs = {
     flake-utils.url = "github:numtide/flake-utils";
+    nix-update-scripts.url = "github:jwillikers/nix-update-scripts";
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-24.05";
     pre-commit-hooks = {
       url = "github:cachix/pre-commit-hooks.nix";
-      inputs = {
-        nixpkgs.follows = "nixpkgs";
-      };
+      inputs.nixpkgs.follows = "nixpkgs";
     };
     treefmt-nix.url = "github:numtide/treefmt-nix";
   };
@@ -14,6 +13,7 @@
     {
       # deadnix: skip
       self,
+      nix-update-scripts,
       nixpkgs,
       flake-utils,
       pre-commit-hooks,
@@ -31,7 +31,8 @@
           just
           lychee
           nil
-          nushell
+          nix-update-scripts.packages.${system}.update-nix-direnv
+          nix-update-scripts.packages.${system}.update-nixos-release
         ];
         buildInputs = with pkgs; [ ];
         caddyOvh = pkgs.buildGoModule {
@@ -147,6 +148,10 @@
       in
       with pkgs;
       {
+        apps = {
+          inherit (nix-update-scripts.apps.${system}) update-nix-direnv;
+          inherit (nix-update-scripts.apps.${system}) update-nixos-release;
+        };
         devShells.default = mkShell {
           inherit buildInputs;
           inherit (pre-commit) shellHook;
