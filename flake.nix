@@ -69,8 +69,8 @@
           copyToRoot = pkgs.buildEnv {
             name = "image-root";
             paths = [
-              pkgs.cacert
               caddyOvh
+              pkgs.cacert
               pkgs.libcap
               pkgs.mailcap
             ];
@@ -81,8 +81,8 @@
           };
 
           # contents = [
-          #   pkgs.cacert
           #   caddyOvh
+          #   pkgs.cacert
           #   pkgs.libcap
           #   pkgs.mailcap
           # ];
@@ -93,7 +93,9 @@
           # '';
 
           # enableFakechroot = true;
-          # extraCommands = ''
+          extraCommands = ''
+            mkdir --parents /config/caddy /data/caddy /etc/caddy /srv /usr/share/caddy
+          '';
           # fakeRootCommands = ''
           #   mkdir --parents /config/caddy /data/caddy /etc/caddy /usr/share/caddy
           #   # ${pkgs.libcap}/bin/setcap cap_net_bind_service=+ep ${caddyOvh}/bin/caddy;
