@@ -32,5 +32,5 @@ update:
     cd caddy-src
     go get -u
     go mod tidy
-    # Update go version in caddy-src/go.mod
-    # todo Update Nix hashes...
+    # Update go version in caddy-src/go.mod?
+    # todo Update Nix hash in default.nix: vendorHash = "sha256-...";
