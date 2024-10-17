@@ -166,8 +166,9 @@
         };
         formatter = treefmtEval.config.build.wrapper;
         packages = {
-          default = caddyOvhImage;
+          default = self.packages.${system}.caddyOvhImage;
           inherit caddyOvh;
+          inherit caddyOvhImage;
         };
       }
     );
