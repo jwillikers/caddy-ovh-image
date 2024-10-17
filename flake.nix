@@ -45,14 +45,21 @@
             mainProgram = "caddy";
           };
         };
-        caddyImage = pkgs.dockerTools.pullImage {
-          imageName = "docker.io/library/caddy";
-          imageDigest = "sha256:63d8776389cc6527e4a23bd9750489dc661923cffc3b9d7e0c20e062fa0325ec";
-          # finalImageName = "docker.io/library/caddy";
-          # finalImageTag = "latest";
-          sha256 = "sha256-aN8AnRkheqyfshefC4gFDwF80GGs3bqRikxT3aqjGxw=";
-          # os = "linux";
-          # arch = "x86_64";
+        caddyImage = {
+          aarch64-linux = pkgs.dockerTools.pullImage {
+            imageName = "docker.io/library/caddy";
+            imageDigest = "sha256:63d8776389cc6527e4a23bd9750489dc661923cffc3b9d7e0c20e062fa0325ec";
+            sha256 = "sha256-msp0C1PVCJV1DYQEfOErqHsxOqLkWQ3jVyT7GpJRndw=";
+          };
+          x86_64-linux = pkgs.dockerTools.pullImage {
+            imageName = "docker.io/library/caddy";
+            imageDigest = "sha256:63d8776389cc6527e4a23bd9750489dc661923cffc3b9d7e0c20e062fa0325ec";
+            # finalImageName = "docker.io/library/caddy";
+            # finalImageTag = "latest";
+            sha256 = "sha256-aN8AnRkheqyfshefC4gFDwF80GGs3bqRikxT3aqjGxw=";
+            # os = "linux";
+            # arch = "x86_64";
+          };
         };
         caddyOvhImage = pkgs.dockerTools.buildImage {
           # caddyOvhImage = pkgs.dockerTools.streamLayeredImage {
@@ -60,7 +67,7 @@
           # name = "caddy-ovh";
           compressor = "zstd";
 
-          fromImage = caddyImage;
+          fromImage = caddyImage.${system};
           # fromImageName = "docker.io/library/caddy";
           # fromImageTag = "latest";
 
