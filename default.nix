@@ -1,42 +1,19 @@
 {
+  # deadnix: skip
   stdenv,
-  boost,
-  cmake,
-  microsoft-gsl,
-  mold-wrapped,
-  ninja,
-  qtbase,
-  qtwayland,
-  ut,
-  wrapQtAppsHook,
+  buildGoModule,
 }:
-stdenv.mkDerivation {
-  pname = "cyrillic-encoder";
-  version = "0.0.1";
-
-  src = ./.;
-
-  buildInputs = [
-    boost
-    microsoft-gsl
-    qtbase
-    qtwayland
-    ut
-  ];
-
-  nativeBuildInputs = [
-    cmake
-    mold-wrapped
-    ninja
-    wrapQtAppsHook
-  ];
-
-  cmakeFlags = [
-    "--preset=minimal"
-    "-DCMAKE_LINKER_TYPE=MOLD"
-  ];
-
-  postBuild = ''
-    cargo objcopy -- -O ihex pwm-fan-controller-attiny85.hex
+buildGoModule {
+  pname = "caddy-ovh";
+  version = "0.1.0";
+  src = ./caddy-src;
+  runVend = true;
+  vendorHash = "sha256-51SNBJlUBE9H8+vYjlXypy6thgjnvw4wTPQBA9K2zyk=";
+  postInstall = ''
+    mkdir --parents $out/etc/caddy/
+    cp Caddyfile $out/etc/caddy/
   '';
+  meta = {
+    mainProgram = "caddy";
+  };
 }
