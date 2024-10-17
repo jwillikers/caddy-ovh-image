@@ -16,6 +16,10 @@ indent_style = unset
 [*.{adoc,envrc,nu}]
 max_line_length = off
 
+[{Caddyfile,*.caddy}]
+indent_size = 4
+indent_style = tab
+
 [go.sum]
 max_line_length = off
 

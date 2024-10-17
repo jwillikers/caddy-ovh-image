@@ -42,39 +42,37 @@
           # postBuild = ''
           #   cargo objcopy -- -O ihex pwm-fan-controller-attiny85.hex
           # '';
+          postInstall = ''
+            mkdir --parents $out/etc/caddy/
+            cp Caddyfile $out/etc/caddy/
+          '';
           meta = {
             mainProgram = "caddy";
           };
         };
-        caddyImage = {
-          aarch64-linux = pkgs.dockerTools.pullImage {
-            imageName = "docker.io/library/caddy";
-            imageDigest = "sha256:63d8776389cc6527e4a23bd9750489dc661923cffc3b9d7e0c20e062fa0325ec";
-            sha256 = "sha256-msp0C1PVCJV1DYQEfOErqHsxOqLkWQ3jVyT7GpJRndw=";
-          };
-          x86_64-linux = pkgs.dockerTools.pullImage {
-            imageName = "docker.io/library/caddy";
-            imageDigest = "sha256:63d8776389cc6527e4a23bd9750489dc661923cffc3b9d7e0c20e062fa0325ec";
-            # finalImageName = "docker.io/library/caddy";
-            # finalImageTag = "latest";
-            sha256 = "sha256-aN8AnRkheqyfshefC4gFDwF80GGs3bqRikxT3aqjGxw=";
-            # os = "linux";
-            # arch = "x86_64";
-          };
-        };
+        # caddyImage = {
+        #   aarch64-linux = pkgs.dockerTools.pullImage {
+        #     imageName = "docker.io/library/caddy";
+        #     imageDigest = "sha256:63d8776389cc6527e4a23bd9750489dc661923cffc3b9d7e0c20e062fa0325ec";
+        #     sha256 = "sha256-msp0C1PVCJV1DYQEfOErqHsxOqLkWQ3jVyT7GpJRndw=";
+        #   };
+        #   x86_64-linux = pkgs.dockerTools.pullImage {
+        #     imageName = "docker.io/library/caddy";
+        #     imageDigest = "sha256:63d8776389cc6527e4a23bd9750489dc661923cffc3b9d7e0c20e062fa0325ec";
+        #     sha256 = "sha256-aN8AnRkheqyfshefC4gFDwF80GGs3bqRikxT3aqjGxw=";
+        #   };
+        # };
         # caddyOvhImage = pkgs.dockerTools.buildImage {
         caddyOvhImage = pkgs.dockerTools.buildLayeredImage {
           name = "localhost/caddy-ovh";
           tag = "${system}";
+          # fromImage = caddyImage.${system};
           compressor = "zstd";
-
-          # architecture = "aarch64";
-
-          fromImage = caddyImage.${system};
 
           # copyToRoot = pkgs.buildEnv {
           #   name = "image-root";
           #   paths = [
+          # pkgs.cacert
           #     caddyOvh
           #     pkgs.libcap
           #     pkgs.mailcap
@@ -83,6 +81,7 @@
           # };
 
           contents = [
+            pkgs.cacert
             caddyOvh
             pkgs.libcap
             pkgs.mailcap
@@ -93,10 +92,11 @@
           #   ${pkgs.libcap}/bin/setcap cap_net_bind_service=+ep ${caddyOvh}/bin/caddy;
           # '';
 
-          # enableFakechroot = true;
+          enableFakechroot = true;
           # extraCommands = ''
           fakeRootCommands = ''
-            ${pkgs.libcap}/bin/setcap cap_net_bind_service=+ep ${caddyOvh}/bin/caddy;
+            mkdir --parents /config/caddy /data/caddy /etc/caddy /usr/share/caddy
+            # ${pkgs.libcap}/bin/setcap cap_net_bind_service=+ep ${caddyOvh}/bin/caddy;
           '';
 
           config = {
@@ -108,11 +108,17 @@
               "--adapter"
               "caddyfile"
             ];
-            # Cmd = [ "/bin/caddy" ];
-            # Cmd = [ "${pkgsLinux.hello}/bin/hello" ];
-            # Env = with pkgs; [ "GEOLITE2_COUNTRY_DB=${clash-geoip}/etc/clash/Country.mmdb" ];
-            # Volumes = { "/data" = { }; };
-            # WorkingDir = "/data";
+            Env = [
+              "XDG_CONFIG_HOME=/config"
+              "XDG_DATA_HOME=/data"
+            ];
+            ExposedPorts = {
+              "80" = { };
+              "443" = { };
+              "443/udp" = { };
+              "2019" = { };
+            };
+            WorkingDir = "/srv";
           };
         };
         treefmt = {
