@@ -94,8 +94,8 @@
           # '';
 
           # enableFakechroot = true;
-          # fakeRootCommands = ''
-          extraCommands = ''
+          # extraCommands = ''
+          fakeRootCommands = ''
             ${pkgs.libcap}/bin/setcap cap_net_bind_service=+ep ${caddyOvh}/bin/caddy;
           '';
 
