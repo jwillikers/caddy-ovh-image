@@ -83,11 +83,13 @@
           ];
 
           # runAsRoot = ''
+          #   #!${pkgs.runtimeShell}
           #   ${pkgs.libcap}/bin/setcap cap_net_bind_service=+ep ${caddyOvh}/bin/caddy;
           # '';
 
           enableFakechroot = true;
           fakeRootCommands = ''
+            #!${pkgs.runtimeShell}
             ${pkgs.libcap}/bin/setcap cap_net_bind_service=+ep ${caddyOvh}/bin/caddy;
           '';
 
