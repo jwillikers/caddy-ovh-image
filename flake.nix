@@ -90,13 +90,14 @@
           #   # libcap
           #   # mailcap
           # ];
-          config = {
-            # Cmd = [ "${caddyOvh}/bin/caddy" ];
-            Cmd = [ "/bin/caddy" ];
-            # Env = with pkgs; [ "GEOLITE2_COUNTRY_DB=${clash-geoip}/etc/clash/Country.mmdb" ];
-            # Volumes = { "/data" = { }; };
-            # WorkingDir = "/data";
-          };
+          # config = {
+          # Cmd = [ "${caddyOvh}/bin/caddy" ];
+          # Cmd = [ "/bin/caddy" ];
+          # Cmd = [ "${pkgsLinux.hello}/bin/hello" ];
+          # Env = with pkgs; [ "GEOLITE2_COUNTRY_DB=${clash-geoip}/etc/clash/Country.mmdb" ];
+          # Volumes = { "/data" = { }; };
+          # WorkingDir = "/data";
+          # };
         };
         treefmt = {
           config = {
