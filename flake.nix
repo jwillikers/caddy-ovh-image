@@ -94,7 +94,7 @@
 
           # enableFakechroot = true;
           extraCommands = ''
-            mkdir --parents /config/caddy /data/caddy /etc/caddy /srv /usr/share/caddy
+            mkdir --parents config/caddy data/caddy etc/caddy srv usr/share/caddy
           '';
           # fakeRootCommands = ''
           #   mkdir --parents /config/caddy /data/caddy /etc/caddy /usr/share/caddy
