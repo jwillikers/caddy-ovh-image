@@ -62,40 +62,42 @@
             # arch = "x86_64";
           };
         };
-        caddyOvhImage = pkgs.dockerTools.buildImage {
-          # caddyOvhImage = pkgs.dockerTools.buildLayeredImage {
+        # caddyOvhImage = pkgs.dockerTools.buildImage {
+        caddyOvhImage = pkgs.dockerTools.buildLayeredImage {
           name = "localhost/caddy-ovh";
           tag = "${system}";
           compressor = "zstd";
 
+          # architecture = "aarch64";
+
           fromImage = caddyImage.${system};
 
-          copyToRoot = pkgs.buildEnv {
-            name = "image-root";
-            paths = [
-              caddyOvh
-              pkgs.libcap
-              pkgs.mailcap
-            ];
-            pathsToLink = [ "/bin" ];
-          };
+          # copyToRoot = pkgs.buildEnv {
+          #   name = "image-root";
+          #   paths = [
+          #     caddyOvh
+          #     pkgs.libcap
+          #     pkgs.mailcap
+          #   ];
+          #   pathsToLink = [ "/bin" ];
+          # };
 
-          # contents = [
-          #   caddyOvh
-          #   pkgs.libcap
-          #   pkgs.mailcap
-          # ];
+          contents = [
+            caddyOvh
+            pkgs.libcap
+            pkgs.mailcap
+          ];
 
-          runAsRoot = ''
-            #!${pkgs.runtimeShell}
-            ${pkgs.libcap}/bin/setcap cap_net_bind_service=+ep ${caddyOvh}/bin/caddy;
-          '';
-
-          # enableFakechroot = true;
-          # fakeRootCommands = ''
+          # runAsRoot = ''
           #   #!${pkgs.runtimeShell}
           #   ${pkgs.libcap}/bin/setcap cap_net_bind_service=+ep ${caddyOvh}/bin/caddy;
           # '';
+
+          # enableFakechroot = true;
+          # fakeRootCommands = ''
+          extraCommands = ''
+            ${pkgs.libcap}/bin/setcap cap_net_bind_service=+ep ${caddyOvh}/bin/caddy;
+          '';
 
           config = {
             Cmd = [
