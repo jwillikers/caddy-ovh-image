@@ -42,6 +42,9 @@ spec:
     - image: quay.io/jwillikers/caddy-ovh:latest
       name: caddy
       securityContext:
+        capabilities:
+          add:
+            - NET_BIND_SERVICE
         # todo Run in the user namespace once Podman supports sysctls.
         # https://github.com/containers/podman/issues/16711
         # sysctls:

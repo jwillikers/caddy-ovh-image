@@ -149,6 +149,7 @@ gitea.example {
 [,sh]
 ----
 podman run \
+  --cap-add NET_BIND_SERVICE \
   --detach \
   --env OVH_ENDPOINT="ovh-eu" \
   --label "io.containers.autoupdate=registry" \
