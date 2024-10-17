@@ -39,9 +39,6 @@
           src = ./caddy-src;
           runVend = true;
           vendorHash = "sha256-51SNBJlUBE9H8+vYjlXypy6thgjnvw4wTPQBA9K2zyk=";
-          # postBuild = ''
-          #   cargo objcopy -- -O ihex pwm-fan-controller-attiny85.hex
-          # '';
           postInstall = ''
             mkdir --parents $out/etc/caddy/
             cp Caddyfile $out/etc/caddy/
@@ -62,42 +59,45 @@
         #     sha256 = "sha256-aN8AnRkheqyfshefC4gFDwF80GGs3bqRikxT3aqjGxw=";
         #   };
         # };
-        # caddyOvhImage = pkgs.dockerTools.buildImage {
-        caddyOvhImage = pkgs.dockerTools.buildLayeredImage {
+        caddyOvhImage = pkgs.dockerTools.buildImage {
+          # caddyOvhImage = pkgs.dockerTools.buildLayeredImage {
           name = "localhost/caddy-ovh";
           tag = "${system}";
           # fromImage = caddyImage.${system};
           compressor = "zstd";
 
-          # copyToRoot = pkgs.buildEnv {
-          #   name = "image-root";
-          #   paths = [
-          # pkgs.cacert
-          #     caddyOvh
-          #     pkgs.libcap
-          #     pkgs.mailcap
-          #   ];
-          #   pathsToLink = [ "/bin" ];
-          # };
+          copyToRoot = pkgs.buildEnv {
+            name = "image-root";
+            paths = [
+              pkgs.cacert
+              caddyOvh
+              pkgs.libcap
+              pkgs.mailcap
+            ];
+            pathsToLink = [
+              "/bin"
+              "/etc"
+            ];
+          };
 
-          contents = [
-            pkgs.cacert
-            caddyOvh
-            pkgs.libcap
-            pkgs.mailcap
-          ];
+          # contents = [
+          #   pkgs.cacert
+          #   caddyOvh
+          #   pkgs.libcap
+          #   pkgs.mailcap
+          # ];
 
           # runAsRoot = ''
           #   #!${pkgs.runtimeShell}
           #   ${pkgs.libcap}/bin/setcap cap_net_bind_service=+ep ${caddyOvh}/bin/caddy;
           # '';
 
-          enableFakechroot = true;
+          # enableFakechroot = true;
           # extraCommands = ''
-          fakeRootCommands = ''
-            mkdir --parents /config/caddy /data/caddy /etc/caddy /usr/share/caddy
-            # ${pkgs.libcap}/bin/setcap cap_net_bind_service=+ep ${caddyOvh}/bin/caddy;
-          '';
+          # fakeRootCommands = ''
+          #   mkdir --parents /config/caddy /data/caddy /etc/caddy /usr/share/caddy
+          #   # ${pkgs.libcap}/bin/setcap cap_net_bind_service=+ep ${caddyOvh}/bin/caddy;
+          # '';
 
           config = {
             Cmd = [
