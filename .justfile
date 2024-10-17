@@ -2,9 +2,9 @@ default: build
 
 alias b := build
 
-build:
+build attribute="caddyOvhImage":
     #!/bin/bash -eux
-    nix build
+    nix build '.#{{ attribute }}'
 
 alias ch := check
 
@@ -20,7 +20,7 @@ format:
     treefmt
 
 alias r := run
-run: build
+run attribute="caddyOvhImage": (build attribute)
     podman image load --input result
     podman run --cap-add NET_BIND_SERVICE --interactive --rm --tty "localhost/caddy-ovh:{{ arch() }}-linux"
 
