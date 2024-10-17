@@ -66,36 +66,30 @@
         caddyOvhImage = pkgs.dockerTools.buildLayeredImage {
           name = "localhost/caddy-ovh";
           tag = "${system}";
-          # name = "caddy-ovh";
           compressor = "zstd";
 
           fromImage = caddyImage.${system};
-          # fromImageName = "docker.io/library/caddy";
-          # fromImageTag = "latest";
 
           # copyToRoot = pkgs.buildEnv {
-          # contents = pkgs.buildEnv {
+          #   name = "image-root";
+          #   paths = [ caddyOvh pkgs.libcap pkgs.mailcap ];
+          #   pathsToLink = [ "/bin" ];
+          # }
+
           contents = [
-            # name = "image-root";
-            # paths = [ caddyOvh pkgs.libcap pkgs.mailcap ];
-            # pathsToLink = [ "/bin" ];
             caddyOvh
             pkgs.libcap
             pkgs.mailcap
           ];
 
-          enableFakechroot = true;
           # runAsRoot = ''
+          #   ${pkgs.libcap}/bin/setcap cap_net_bind_service=+ep ${caddyOvh}/bin/caddy;
+          # '';
+
+          enableFakechroot = true;
           fakeRootCommands = ''
             ${pkgs.libcap}/bin/setcap cap_net_bind_service=+ep ${caddyOvh}/bin/caddy;
           '';
-
-          # copyToRoot = with pkgs; [
-          #   # cacert
-          #   caddyOvh
-          #   libcap
-          #   mailcap
-          # ];
 
           config = {
             Cmd = [
