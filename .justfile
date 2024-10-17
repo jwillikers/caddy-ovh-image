@@ -21,23 +21,16 @@ format:
 
 alias r := run
 run: build
-    podman load < result
-    podman run "quay.io/jwillikers/caddy-ovh-{{ arch() }}-linux:latest"
-
-alias t := test
-
-test: build
-    nu update-nix-direnv-tests.nu
+    podman image load --input result
+    podman run --cap-add NET_BIND_SERVICE --interactive --rm --tty "localhost/caddy-ovh:{{ arch() }}-linux"
 
 alias u := update
 alias up := update
 
 update:
-    nu update-nixos-release.nu
     nix flake update
     cd caddy-src
     go get -u
     go mod tidy
     # Update go version in caddy-src/go.mod
     # todo Update Nix hashes...
-    nu update-nix-direnv.nu
