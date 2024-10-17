@@ -1,12 +1,11 @@
 {
   inputs = {
     flake-utils.url = "github:numtide/flake-utils";
+    nix-update-scripts.url = "github:jwillikers/nix-update-scripts";
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-24.05";
     pre-commit-hooks = {
       url = "github:cachix/pre-commit-hooks.nix";
-      inputs = {
-        nixpkgs.follows = "nixpkgs";
-      };
+      inputs.nixpkgs.follows = "nixpkgs";
     };
     treefmt-nix.url = "github:numtide/treefmt-nix";
   };
@@ -14,6 +13,7 @@
     {
       # deadnix: skip
       self,
+      nix-update-scripts,
       nixpkgs,
       flake-utils,
       pre-commit-hooks,
@@ -31,7 +31,8 @@
           just
           lychee
           nil
-          nushell
+          nix-update-scripts.packages.${system}.update-nix-direnv
+          nix-update-scripts.packages.${system}.update-nixos-release
         ];
         buildInputs = with pkgs; [ ];
         caddyOvh = pkgs.buildGoModule {
@@ -44,14 +45,21 @@
             mainProgram = "caddy";
           };
         };
-        caddyImage = pkgs.dockerTools.pullImage {
-          imageName = "docker.io/library/caddy";
-          imageDigest = "sha256:63d8776389cc6527e4a23bd9750489dc661923cffc3b9d7e0c20e062fa0325ec";
-          # finalImageName = "docker.io/library/caddy";
-          # finalImageTag = "latest";
-          sha256 = "sha256-aN8AnRkheqyfshefC4gFDwF80GGs3bqRikxT3aqjGxw=";
-          # os = "linux";
-          # arch = "x86_64";
+        caddyImage = {
+          aarch64-linux = pkgs.dockerTools.pullImage {
+            imageName = "docker.io/library/caddy";
+            imageDigest = "sha256:63d8776389cc6527e4a23bd9750489dc661923cffc3b9d7e0c20e062fa0325ec";
+            sha256 = "sha256-msp0C1PVCJV1DYQEfOErqHsxOqLkWQ3jVyT7GpJRndw=";
+          };
+          x86_64-linux = pkgs.dockerTools.pullImage {
+            imageName = "docker.io/library/caddy";
+            imageDigest = "sha256:63d8776389cc6527e4a23bd9750489dc661923cffc3b9d7e0c20e062fa0325ec";
+            # finalImageName = "docker.io/library/caddy";
+            # finalImageTag = "latest";
+            sha256 = "sha256-aN8AnRkheqyfshefC4gFDwF80GGs3bqRikxT3aqjGxw=";
+            # os = "linux";
+            # arch = "x86_64";
+          };
         };
         caddyOvhImage = pkgs.dockerTools.buildImage {
           # caddyOvhImage = pkgs.dockerTools.streamLayeredImage {
@@ -59,7 +67,7 @@
           # name = "caddy-ovh";
           compressor = "zstd";
 
-          fromImage = caddyImage;
+          fromImage = caddyImage.${system};
           # fromImageName = "docker.io/library/caddy";
           # fromImageTag = "latest";
 
@@ -147,6 +155,10 @@
       in
       with pkgs;
       {
+        apps = {
+          inherit (nix-update-scripts.apps.${system}) update-nix-direnv;
+          inherit (nix-update-scripts.apps.${system}) update-nixos-release;
+        };
         devShells.default = mkShell {
           inherit buildInputs;
           inherit (pre-commit) shellHook;
@@ -161,8 +173,9 @@
         };
         formatter = treefmtEval.config.build.wrapper;
         packages = {
-          default = caddyOvhImage;
+          default = self.packages.${system}.caddyOvhImage;
           inherit caddyOvh;
+          inherit caddyOvhImage;
         };
       }
     );
