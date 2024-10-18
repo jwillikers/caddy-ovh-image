@@ -36,20 +36,9 @@ jobs:
           extra-conf: |
             extra-platforms = aarch64-linux
       - uses: DeterminateSystems/magic-nix-cache-action@v8
-      # - name: Configure Podman and Buildah to use FUSE
-      #   run: |
-      #     sudo apt-get --yes install fuse-overlayfs
-      #     mkdir --parents ~/.config/containers
-      #     printf '[storage]\ndriver="overlay"\n\n[storage.options]\nmount_program="/usr/bin/fuse-overlayfs"\n' \
-      #       > ~/.config/containers/storage.conf
       - name: Build the image
-        # run: podman build . --arch ${{ matrix.arch }} --tag caddy-ovh-${{ matrix.arch }}
         run: nix build '.#packages.${{ matrix.arch }}-linux.caddyOvhImage'
-      # - name: Load the aarch64 image
-      #   run: podman image load --input caddy-ovh-aarch64.tar.zst
       - name: Export the image
-        # run: podman image save --format oci-archive --output caddy-ovh-${{ matrix.arch }}.tar \
-        #      localhost/caddy-ovh-${{ matrix.arch }}
         run: ln --force --symbolic --relative "$(readlink result)" "caddy-ovh-${{ matrix.arch }}-linux.tar.zst"
       - uses: actions/upload-artifact@v4
         with:
