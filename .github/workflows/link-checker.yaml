@@ -4,17 +4,17 @@ name: Check URLs with Lychee
   pull_request:
     branches: [main]
     paths:
-      - .github/workflows/link-checker.yaml
       - '**.adoc'
       - '**.nix'
+      - .github/workflows/link-checker.yaml
       - flake.lock
       - lychee.toml
   push:
     branches: [main]
     paths:
-      - .github/workflows/link-checker.yaml
       - '**.adoc'
       - '**.nix'
+      - .github/workflows/link-checker.yaml
       - flake.lock
       - lychee.toml
   schedule:

@@ -13,7 +13,7 @@ trim_trailing_whitespace = true
 indent_size = unset
 indent_style = unset
 
-[*.{adoc,envrc,nu}]
+[*.{adoc,envrc,nu,yaml,yml}]
 max_line_length = off
 
 [{Caddyfile,*.caddy}]
