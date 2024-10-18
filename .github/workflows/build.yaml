@@ -2,16 +2,16 @@ name: Build
 "on":
   pull_request:
     paths:
-      - .github/workflows/build.yaml
       - '**.nix'
+      - .github/workflows/build.yaml
       - caddy-src/
       - flake.lock
   push:
     branches:
       - main
     paths:
-      - .github/workflows/build.yaml
       - '**.nix'
+      - .github/workflows/build.yaml
       - caddy-src/
       - flake.lock
   schedule:

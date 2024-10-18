@@ -6,15 +6,15 @@ name: Check URLs with Lychee
     paths:
       - .github/workflows/link-checker.yaml
       - '**.adoc'
+      - '**.nix'
       - flake.lock
-      - flake.nix
   push:
     branches: [main]
     paths:
       - .github/workflows/link-checker.yaml
       - '**.adoc'
+      - '**.nix'
       - flake.lock
-      - flake.nix
   schedule:
     # Run once a month on the 14th.
     - cron: "0 0 14 * *"

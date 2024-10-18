@@ -3,12 +3,12 @@ name: yamllint
   pull_request:
     branches: ["main"]
     paths:
+      - '**.nix'
+      - '**.yaml'
+      - '**.yml'
       - .github/workflows/yamllint.yaml
       - .yamllint.yaml
       - flake.lock
-      - flake.nix
-      - '**.yaml'
-      - '**.yml'
 
 jobs:
   yamllint:
