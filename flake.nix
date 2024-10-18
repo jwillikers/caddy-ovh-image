@@ -33,14 +33,14 @@
           nil
         ];
         buildInputs = with pkgs; [ ];
-        caddyOvh = pkgs.callPackage ./default.nix { };
-        caddyOvhImage = pkgs.dockerTools.buildLayeredImage {
+        caddy-ovh = pkgs.callPackage ./default.nix { };
+        caddy-ovh-image = pkgs.dockerTools.buildLayeredImage {
           name = "localhost/caddy-ovh";
           tag = "${system}";
           compressor = "zstd";
 
           contents = [
-            caddyOvh
+            caddy-ovh
             pkgs.cacert
           ];
 
@@ -51,12 +51,12 @@
           # todo It would be nice if I could get this to work.
           # enableFakechroot = true;
           # fakeRootCommands = ''
-          #  ${pkgs.libcap}/bin/setcap cap_net_bind_service=+ep ${caddyOvh}/bin/caddy;
+          #  ${pkgs.libcap}/bin/setcap cap_net_bind_service=+ep ${caddy-ovh}/bin/caddy;
           # '';
 
           config = {
             Cmd = [
-              "${caddyOvh}/bin/caddy"
+              "${caddy-ovh}/bin/caddy"
               "run"
               "--config"
               "/etc/caddy/Caddyfile"
@@ -152,9 +152,9 @@
         };
         formatter = treefmtEval.config.build.wrapper;
         packages = {
-          default = self.packages.${system}.caddyOvhImage;
-          inherit caddyOvh;
-          inherit caddyOvhImage;
+          default = self.packages.${system}.caddy-ovh-image;
+          inherit caddy-ovh;
+          inherit caddy-ovh-image;
         };
       }
     );

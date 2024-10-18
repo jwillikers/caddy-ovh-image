@@ -2,7 +2,7 @@ name: Build
 "on":
   pull_request:
     paths:
-      - '**.nix'
+      - "**.nix"
       - .github/workflows/build.yaml
       - caddy-src/
       - flake.lock
@@ -10,7 +10,7 @@ name: Build
     branches:
       - main
     paths:
-      - '**.nix'
+      - "**.nix"
       - .github/workflows/build.yaml
       - caddy-src/
       - flake.lock
@@ -37,7 +37,7 @@ jobs:
             extra-platforms = aarch64-linux
       - uses: DeterminateSystems/magic-nix-cache-action@v8
       - name: Build the image
-        run: nix build '.#packages.${{ matrix.arch }}-linux.caddyOvhImage'
+        run: nix build '.#packages.${{ matrix.arch }}-linux.caddy-ovh-image'
       - name: Export the image
         run: ln --force --symbolic --relative "$(readlink result)" "caddy-ovh-${{ matrix.arch }}-linux.tar.zst"
       - uses: actions/upload-artifact@v4
