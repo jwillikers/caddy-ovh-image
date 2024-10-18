@@ -37,5 +37,7 @@
     "slirp",
     "tlskyber",
     "userns"
-  ]
+  ],
+  "nix.enableLanguageServer": true,
+  "nix.serverPath": "nil"
 }

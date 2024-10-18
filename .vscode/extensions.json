@@ -1,0 +1,14 @@
+{
+  "recommendations": [
+    "asciidoctor.asciidoctor-vscode",
+    "zamerick.vscode-caddyfile-syntax",
+    "mkhl.direnv",
+    "editorconfig.editorconfig",
+    "github.vscode-github-actions",
+    "golang.go",
+    "jnoortheen.nix-ide",
+    "ibecker.treefmt-vscode",
+    "nefrob.vscode-just-syntax",
+    "tekumara.typos-vscode"
+  ]
+}
