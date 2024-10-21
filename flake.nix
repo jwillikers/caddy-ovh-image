@@ -130,7 +130,6 @@
           inherit (nix-update-scripts.apps.${system}) update-nixos-release;
         };
         devShells.default = mkShell {
-          inherit buildInputs;
           inherit (pre-commit) shellHook;
           nativeBuildInputs =
             with pkgs;
