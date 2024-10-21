@@ -24,15 +24,6 @@
       let
         overlays = [ ];
         pkgs = import nixpkgs { inherit system overlays; };
-        nativeBuildInputs = with pkgs; [
-          asciidoctor
-          fish
-          dive
-          just
-          lychee
-          nil
-        ];
-        buildInputs = with pkgs; [ ];
         caddy-ovh = pkgs.callPackage ./default.nix { };
         caddy-ovh-image = pkgs.dockerTools.buildLayeredImage {
           name = "localhost/caddy-ovh";
@@ -142,8 +133,13 @@
           inherit buildInputs;
           inherit (pre-commit) shellHook;
           nativeBuildInputs =
-            nativeBuildInputs
-            ++ [
+            with pkgs;
+            [
+              asciidoctor
+              fish
+              just
+              lychee
+              nil
               treefmtEval.config.build.wrapper
               # Make formatters available for IDE's.
               (lib.attrValues treefmtEval.config.build.programs)
