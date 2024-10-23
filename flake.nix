@@ -24,7 +24,7 @@
       let
         overlays = [ ];
         pkgs = import nixpkgs { inherit system overlays; };
-        caddy-ovh = pkgs.callPackage ./default.nix { };
+        caddy-ovh = pkgs.callPackage ./caddy-ovh.nix { };
         caddy-ovh-image = pkgs.dockerTools.buildLayeredImage {
           name = "localhost/caddy-ovh";
           tag = "${system}";
@@ -128,6 +128,29 @@
         apps = {
           inherit (nix-update-scripts.apps.${system}) update-nix-direnv;
           inherit (nix-update-scripts.apps.${system}) update-nixos-release;
+          update-go-module =
+            let
+              script = pkgs.writeShellApplication {
+                name = "update-go-module";
+                text = ''
+                  set -eou pipefail
+                  rm --force caddy-src/go.{mod,sum}
+                  (cd caddy-src && ${pkgs.go}/bin/go mod init caddy 2>/dev/null)
+                  (cd caddy-src && ${pkgs.go}/bin/go mod tidy 2>/dev/null)
+                  oldVendorHash=$(${pkgs.nix}/bin/nix eval --quiet --raw .#caddy-ovh.vendorHash)
+                  newVendorHash=$(${pkgs.nix-prefetch}/bin/nix-prefetch \
+                      --expr "{ sha256 }: ((callPackage (import ./caddy-ovh.nix) { }).overrideAttrs"\
+                        " { vendorHash = sha256; }).goModules" \
+                      --option extra-experimental-features flakes \
+                      --silent)
+                  sed --in-place "s/vendorHash = \"$oldVendorHash\";/vendorHash = \"$newVendorHash\";/" caddy-ovh.nix
+                '';
+              };
+            in
+            {
+              type = "app";
+              program = "${script}/bin/update-go-module";
+            };
         };
         devShells.default = mkShell {
           inherit (pre-commit) shellHook;
@@ -139,6 +162,7 @@
               just
               lychee
               nil
+              nix-prefetch
               treefmtEval.config.build.wrapper
               # Make formatters available for IDE's.
               (lib.attrValues treefmtEval.config.build.programs)
