@@ -1,4 +1,4 @@
-name: Update Caddy
+name: Update Go module
 
 "on":
   schedule:
@@ -10,7 +10,7 @@ permissions:
   pull-requests: write
 
 jobs:
-  update-caddy:
+  update-go-module:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -22,7 +22,7 @@ jobs:
         uses: peter-evans/create-pull-request@v7
         with:
           assignees: ${{ github.repository_owner }}
-          branch: "update/caddy-ovh-go-module"
+          branch: "update/go-module"
           commit-message: "chore(deps): Update the Caddy OVH Go module"
           title: "chore(deps): Update the Caddy OVH Go module"
           token: ${{ secrets.GH_TOKEN_FOR_UPDATES }}
