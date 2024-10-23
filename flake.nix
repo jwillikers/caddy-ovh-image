@@ -98,8 +98,8 @@
                   (cd caddy-src && ${pkgs.go}/bin/go mod tidy)
                   oldVendorHash=$(${pkgs.nix}/bin/nix eval --quiet --raw .#caddy-ovh.vendorHash)
                   newVendorHash=$(${pkgs.nix-prefetch}/bin/nix-prefetch \
-                      --expr "{ sha256 }: ((callPackage (import ./caddy-ovh.nix) { }).overrideAttrs"\
-                        " { vendorHash = sha256; }).goModules" \
+                      --expr "{ sha256 }: ((callPackage (import ./caddy-ovh.nix) { }).overrideAttrs \
+                        { vendorHash = sha256; }).goModules" \
                       --option extra-experimental-features flakes \
                   )
                   sed --in-place "s/vendorHash = \"$oldVendorHash\";/vendorHash = \"$newVendorHash\";/" caddy-ovh.nix
