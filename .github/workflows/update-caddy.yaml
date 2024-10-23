@@ -10,14 +10,14 @@ permissions:
   pull-requests: write
 
 jobs:
-  update-nix-direnv:
+  update-caddy:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: DeterminateSystems/nix-installer-action@v14
       - uses: DeterminateSystems/magic-nix-cache-action@v8
       - name: Update the Caddy OVH Go module
-        run: nix develop --command '.#update-go-module'
+        run: nix run '.#update-go-module'
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v7
         with:
