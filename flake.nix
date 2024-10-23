@@ -39,12 +39,6 @@
             mkdir --parents config/caddy data/caddy etc/caddy srv usr/share/caddy
           '';
 
-          # todo It would be nice if I could get this to work.
-          # enableFakechroot = true;
-          # fakeRootCommands = ''
-          #  ${pkgs.libcap}/bin/setcap cap_net_bind_service=+ep ${caddy-ovh}/bin/caddy;
-          # '';
-
           config = {
             Cmd = [
               "${caddy-ovh}/bin/caddy"
