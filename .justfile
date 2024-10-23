@@ -3,7 +3,6 @@ default: build
 alias b := build
 
 build attribute="caddy-ovh-image":
-    #!/bin/bash -eux
     nix build '.#{{ attribute }}'
 
 alias ch := check
@@ -29,8 +28,4 @@ alias up := update
 
 update:
     nix flake update
-    cd caddy-src
-    go get -u
-    go mod tidy
-    # Update go version in caddy-src/go.mod?
-    # todo Update Nix hash in default.nix: vendorHash = "sha256-...";
+    nix run '.#update-go-module'
