@@ -94,14 +94,14 @@
                 text = ''
                   set -eou pipefail
                   rm --force caddy-src/go.{mod,sum}
-                  (cd caddy-src && ${pkgs.go}/bin/go mod init caddy 2>/dev/null)
-                  (cd caddy-src && ${pkgs.go}/bin/go mod tidy 2>/dev/null)
+                  (cd caddy-src && ${pkgs.go}/bin/go mod init caddy)
+                  (cd caddy-src && ${pkgs.go}/bin/go mod tidy)
                   oldVendorHash=$(${pkgs.nix}/bin/nix eval --quiet --raw .#caddy-ovh.vendorHash)
                   newVendorHash=$(${pkgs.nix-prefetch}/bin/nix-prefetch \
                       --expr "{ sha256 }: ((callPackage (import ./caddy-ovh.nix) { }).overrideAttrs"\
                         " { vendorHash = sha256; }).goModules" \
                       --option extra-experimental-features flakes \
-                      --silent)
+                  )
                   sed --in-place "s/vendorHash = \"$oldVendorHash\";/vendorHash = \"$newVendorHash\";/" caddy-ovh.nix
                 '';
               };
