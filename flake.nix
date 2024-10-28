@@ -57,7 +57,7 @@
                   set -eou pipefail
                   rm --force packages/caddy-ovh/src/go.{mod,sum}
                   (cd packages/caddy-ovh/src && ${pkgs.go}/bin/go mod init caddy 2>/dev/null)
-                  (cd caddy-src && ${pkgs.go}/bin/go mod tidy 2>/dev/null)
+                  (cd packages/caddy-ovh/src && ${pkgs.go}/bin/go mod tidy 2>/dev/null)
                   oldVendorHash=$(${pkgs.nix}/bin/nix eval --quiet --raw .#caddy-ovh.vendorHash)
                   newVendorHash=$(${pkgs.nix-prefetch}/bin/nix-prefetch \
                       --expr "{ sha256 }: ((callPackage (import ./packages/caddy-ovh/package.nix) { }).overrideAttrs \
