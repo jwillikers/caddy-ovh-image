@@ -84,7 +84,6 @@
               fish
               just
               lychee
-              nil
               nix-prefetch
               treefmtEval.config.build.wrapper
               (builtins.attrValues treefmtEval.config.build.programs)
