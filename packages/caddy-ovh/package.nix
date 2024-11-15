@@ -5,8 +5,7 @@ buildGoModule {
   src = ./src;
   vendorHash = "sha256-51SNBJlUBE9H8+vYjlXypy6thgjnvw4wTPQBA9K2zyk=";
   postInstall = ''
-    mkdir --parents $out/etc/caddy/
-    cp Caddyfile $out/etc/caddy/
+    install -D --mode=0644 --target-directory=$out/etc/caddy/ Caddyfile
   '';
   meta = {
     mainProgram = "caddy";
