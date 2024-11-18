@@ -40,7 +40,7 @@
         pkgs = import nixpkgs { inherit system overlays; };
         packages = import ./packages { inherit pkgs; };
         pre-commit = pre-commit-hooks.lib.${system}.run (
-          import ./pre-commit-hooks.nix { inherit pkgs treefmtEval; }
+          import ./pre-commit-hooks.nix { inherit treefmtEval; }
         );
         treefmtEval = treefmt-nix.lib.evalModule pkgs ./treefmt.nix;
       in
