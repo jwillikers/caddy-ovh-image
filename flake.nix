@@ -49,31 +49,29 @@
         apps = {
           inherit (nix-update-scripts.apps.${system}) update-nix-direnv;
           inherit (nix-update-scripts.apps.${system}) update-nixos-release;
-          update-go-module =
-            let
-              script = pkgs.writeShellApplication {
-                name = "update-go-module";
-                text = ''
-                  set -eou pipefail
-                  rm --force packages/caddy-ovh/src/go.{mod,sum}
-                  (cd packages/caddy-ovh/src && ${pkgs.go}/bin/go mod init caddy 2>/dev/null)
-                  (cd packages/caddy-ovh/src && ${pkgs.go}/bin/go mod tidy 2>/dev/null)
-                  oldVendorHash=$(${pkgs.nix}/bin/nix eval --quiet --raw .#caddy-ovh.vendorHash)
-                  newVendorHash=$(${pkgs.nix-prefetch}/bin/nix-prefetch \
-                      --expr "{ sha256 }: ((callPackage (import ./packages/caddy-ovh/package.nix) { }).overrideAttrs \
-                        { vendorHash = sha256; }).goModules" \
-                      --option extra-experimental-features flakes \
-                      --quiet \
-                  )
-                  sed --in-place "s/vendorHash = \"$oldVendorHash\";/vendorHash = \"$newVendorHash\";/" \
-                    packages/caddy-ovh/package.nix
-                '';
-              };
-            in
-            {
-              type = "app";
-              program = "${script}/bin/update-go-module";
-            };
+          update-go-module = {
+            type = "app";
+            program = builtins.toString (
+              pkgs.writers.writeNu "update-go-module" ''
+                cd packages/caddy-ovh/src
+                rm --force ...(glob go.{mod,sum})
+                ^${pkgs.lib.getExe pkgs.go} mod init caddy
+                ^${pkgs.lib.getExe pkgs.go} mod tidy
+                cd -
+                let oldVendorHash = (^${pkgs.lib.getExe pkgs.nix} eval --quiet --raw ".#caddy-ovh.vendorHash")
+                let newVendorHash = (
+                  ^${pkgs.lib.getExe pkgs.nurl}
+                  --expr "((import <nixpkgs> { }).callPackage ./packages/caddy-ovh/package.nix { }).goModules"
+                  --nixpkgs ${nixpkgs}
+                )
+                (
+                  open packages/caddy-ovh/package.nix |
+                  str replace $"vendorHash = \"($oldVendorHash)\";" $"vendorHash = \"($newVendorHash)\";" |
+                  save --force packages/caddy-ovh/package.nix
+                )
+              ''
+            );
+          };
         };
         devShells.default = mkShell {
           inherit (pre-commit) shellHook;
@@ -84,7 +82,7 @@
               fish
               just
               lychee
-              nix-prefetch
+              nurl
               treefmtEval.config.build.wrapper
               (builtins.attrValues treefmtEval.config.build.programs)
             ]
