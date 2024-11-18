@@ -17,7 +17,7 @@ jobs:
       - uses: DeterminateSystems/nix-installer-action@v16
       - uses: DeterminateSystems/magic-nix-cache-action@v8
       - name: Update the Caddy OVH Go module
-        run: nix run '.#update-go-module'
+        run: nix run .#update-go-module
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v7
         with:

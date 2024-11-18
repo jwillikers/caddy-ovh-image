@@ -40,15 +40,14 @@
         pkgs = import nixpkgs { inherit system overlays; };
         packages = import ./packages { inherit pkgs; };
         pre-commit = pre-commit-hooks.lib.${system}.run (
-          import ./pre-commit-hooks.nix { inherit treefmtEval; }
+          import ./pre-commit-hooks.nix { inherit pkgs treefmtEval; }
         );
         treefmtEval = treefmt-nix.lib.evalModule pkgs ./treefmt.nix;
       in
       with pkgs;
       {
         apps = {
-          inherit (nix-update-scripts.apps.${system}) update-nix-direnv;
-          inherit (nix-update-scripts.apps.${system}) update-nixos-release;
+          inherit (nix-update-scripts.apps.${system}) update-nix-direnv update-nixos-release;
           update-go-module = {
             type = "app";
             program = builtins.toString (
