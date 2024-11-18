@@ -49,9 +49,10 @@
         apps = {
           inherit (nix-update-scripts.apps.${system}) update-nix-direnv;
           inherit (nix-update-scripts.apps.${system}) update-nixos-release;
-          update-go-module =
-            let
-              script = pkgs.writers.writeNu "update-go-module" ''
+          update-go-module = {
+            type = "app";
+            program = builtins.toString (
+              pkgs.writers.writeNu "update-go-module" ''
                 cd packages/caddy-ovh/src
                 rm --force ...(glob go.{mod,sum})
                 ^${pkgs.lib.getExe pkgs.go} mod init caddy
@@ -68,12 +69,9 @@
                   str replace $"vendorHash = \"($oldVendorHash)\";" $"vendorHash = \"($newVendorHash)\";" |
                   save --force packages/caddy-ovh/package.nix
                 )
-              '';
-            in
-            {
-              type = "app";
-              program = "${script}";
-            };
+              ''
+            );
+          };
         };
         devShells.default = mkShell {
           inherit (pre-commit) shellHook;
