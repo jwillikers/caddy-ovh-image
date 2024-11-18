@@ -33,6 +33,7 @@
     "Podman",
     "printf",
     "proxying",
+    "readlink",
     "releasever",
     "Silverblue",
     "slirp",
