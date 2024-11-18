@@ -54,12 +54,12 @@
               script = pkgs.writers.writeNu "update-go-module" ''
                 cd packages/caddy-ovh/src
                 rm --force ...(glob go.{mod,sum})
-                ^${nixpkgs.lib.getExe pkgs.go} mod init caddy
-                ^${nixpkgs.lib.getExe pkgs.go} mod tidy
+                ^${pkgs.lib.getExe pkgs.go} mod init caddy
+                ^${pkgs.lib.getExe pkgs.go} mod tidy
                 cd -
-                let oldVendorHash = (^${nixpkgs.lib.getExe pkgs.nix} eval --quiet --raw ".#caddy-ovh.vendorHash")
+                let oldVendorHash = (^${pkgs.lib.getExe pkgs.nix} eval --quiet --raw ".#caddy-ovh.vendorHash")
                 let newVendorHash = (
-                  ^${nixpkgs.lib.getExe pkgs.nurl}
+                  ^${pkgs.lib.getExe pkgs.nurl}
                   --expr "((import <nixpkgs> { }).callPackage ./packages/caddy-ovh/package.nix { }).goModules"
                   --nixpkgs ${nixpkgs}
                 )
