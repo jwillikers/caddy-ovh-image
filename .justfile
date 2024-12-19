@@ -17,9 +17,10 @@ alias f := format
 alias fmt := format
 
 format:
-    treefmt
+    treefmt-nix
 
 alias r := run
+
 run attribute="caddy-ovh-image": (build attribute)
     podman image load --input result
     podman run \
