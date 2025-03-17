@@ -1,6 +1,6 @@
 module caddy
 
-go 1.23.3
+go 1.23.6
 
 require (
 	github.com/caddy-dns/ovh v0.0.3
