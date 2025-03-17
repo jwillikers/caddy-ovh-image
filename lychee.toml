@@ -2,7 +2,11 @@
 accept = [429]
 
 cache = true
-exclude = ['^http://www\.gnu\.org', '^https://www\.gnu\.org']
+exclude = [
+  '^http://www\.gnu\.org',
+  '^https://www\.gnu\.org',
+  '^https://www\.ovh\.com/auth/api/createToken',
+]
 exclude_path = [
   ".cache/",
   ".direnv/",
