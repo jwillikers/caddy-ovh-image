@@ -13,6 +13,7 @@
     "conflist",
     "Containerfile",
     "creds",
+    "deadnix",
     "direnv",
     "fedoraproject",
     "gitea",
@@ -28,8 +29,11 @@
     "nextcloud-client",
     "nextcloudcmd",
     "nixos",
+    "nixpkgs",
+    "nurl",
     "ostree",
     "overlayfs",
+    "pkgs",
     "Podman",
     "printf",
     "proxying",
@@ -38,6 +42,7 @@
     "Silverblue",
     "slirp",
     "tlskyber",
+    "treefmt",
     "userns"
   ],
   "files.watcherExclude": {
