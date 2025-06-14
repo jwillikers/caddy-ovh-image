@@ -35,7 +35,6 @@ jobs:
         with:
           extra-conf: |
             extra-platforms = aarch64-linux
-      - uses: DeterminateSystems/magic-nix-cache-action@v9
       - name: Build the image
         run: nix build .#packages.${{ matrix.arch }}-linux.caddy-ovh-image
       - name: Export the image
