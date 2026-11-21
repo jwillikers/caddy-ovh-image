@@ -10,7 +10,7 @@
         treefmt-nix.follows = "treefmt-nix";
       };
     };
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.05";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-26.05";
     pre-commit-hooks = {
       url = "github:cachix/pre-commit-hooks.nix";
       inputs = {
@@ -82,8 +82,8 @@
               lychee
               nurl
               treefmtEval.config.build.wrapper
-              (builtins.attrValues treefmtEval.config.build.programs)
             ]
+            ++ (builtins.attrValues treefmtEval.config.build.programs)
             ++ pre-commit.enabledPackages;
         };
         formatter = treefmtEval.config.build.wrapper;
