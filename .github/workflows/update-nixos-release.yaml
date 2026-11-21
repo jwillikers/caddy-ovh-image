@@ -13,8 +13,8 @@ jobs:
   update-nixos-release:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: DeterminateSystems/nix-installer-action@v16
+      - uses: actions/checkout@v7
+      - uses: DeterminateSystems/nix-installer-action@v23
       - name: Update the NixOS release in flake.nix to the latest
         run: |
           nix run .#update-nixos-release
@@ -22,10 +22,17 @@ jobs:
             nix flake update
           fi
       - name: Create Pull Request
-        uses: peter-evans/create-pull-request@v7
+        id: cpr
+        uses: peter-evans/create-pull-request@v8
         with:
           assignees: ${{ github.repository_owner }}
           branch: "update/nixos"
           commit-message: "chore(deps): Update NixOS release"
           title: "chore(deps): Update NixOS release"
           token: ${{ secrets.GH_TOKEN_FOR_UPDATES }}
+      - name: Enable auto-merge
+        if: steps.cpr.outputs.pull-request-number
+        # Use the PAT so that the merge triggers the push workflows on main.
+        run: gh pr merge --auto --merge "${{ steps.cpr.outputs.pull-request-number }}"
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN_FOR_UPDATES }}
