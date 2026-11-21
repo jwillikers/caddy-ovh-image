@@ -1,11 +1,6 @@
 name: Build
 "on":
   pull_request:
-    paths:
-      - "**.nix"
-      - .github/workflows/build.yaml
-      - packages/caddy-ovh/src/
-      - flake.lock
   push:
     branches:
       - main
@@ -18,6 +13,10 @@ name: Build
     # Run at 04:10 on Sunday
     - cron: "10 4 * * 0"
 
+permissions:
+  contents: read
+  pull-requests: read
+
 jobs:
   build:
     name: Build
@@ -28,18 +27,39 @@ jobs:
           - aarch64
           - x86_64
     steps:
-      - uses: actions/checkout@v4
+      # Always run this job so that required status checks report on every PR,
+      # but only do the work when relevant files changed.
+      - uses: dorny/paths-filter@v4
+        id: filter
+        if: github.event_name == 'pull_request'
+        with:
+          filters: |
+            relevant:
+              - "**.nix"
+              - .github/workflows/build.yaml
+              - packages/caddy-ovh/src/**
+              - flake.lock
+      - name: Determine whether to run
+        id: gate
+        run: echo "run=${{ github.event_name != 'pull_request' || steps.filter.outputs.relevant == 'true' }}" >> "$GITHUB_OUTPUT"
+      - uses: actions/checkout@v7
+        if: steps.gate.outputs.run == 'true'
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
-      - uses: DeterminateSystems/nix-installer-action@v16
+        if: steps.gate.outputs.run == 'true'
+        uses: docker/setup-qemu-action@v4
+      - uses: DeterminateSystems/nix-installer-action@v23
+        if: steps.gate.outputs.run == 'true'
         with:
           extra-conf: |
             extra-platforms = aarch64-linux
       - name: Build the image
+        if: steps.gate.outputs.run == 'true'
         run: nix build .#packages.${{ matrix.arch }}-linux.caddy-ovh-image
       - name: Export the image
+        if: steps.gate.outputs.run == 'true'
         run: ln --force --symbolic --relative "$(readlink result)" "caddy-ovh-${{ matrix.arch }}-linux.tar.zst"
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
+        if: steps.gate.outputs.run == 'true'
         with:
           name: caddy-ovh-${{ matrix.arch }}-linux
           path: caddy-ovh-${{ matrix.arch }}-linux.tar.zst
@@ -54,7 +74,7 @@ jobs:
         run: buildah manifest create caddy-ovh:latest
 
       # aarch64
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           name: caddy-ovh-aarch64-linux
 
@@ -66,7 +86,7 @@ jobs:
         run: buildah manifest add caddy-ovh:latest localhost/caddy-ovh:aarch64-linux
 
       # x86_64
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           name: caddy-ovh-x86_64-linux
 
