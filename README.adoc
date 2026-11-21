@@ -283,7 +283,7 @@ Refer to the project's link:CODE_OF_CONDUCT.adoc[Code of Conduct] for details.
 
 This repository is licensed under the https://www.gnu.org/licenses/gpl-3.0.html[GPLv3], a copy of which is provided in the link:LICENSE.adoc[license file].
 
-© 2023-2024 Jordan Williams
+© 2023-2026 Jordan Williams
 
 == Authors
 
